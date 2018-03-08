@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--<meta http-equiv="refresh" content="20">-->
+
+    <title>Render Monitor</title>
+
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/jquery-3.2.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='dist/jqueryui/jquery-ui.min.js')}}"></script>
+
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/tabulator.min.js')}}"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href="{{url_for('static',filename='dist/css/custom.css')}}" rel="stylesheet">
+
+
+
+
+    <title>Render Monitor</title>
+</head>
+<body>
+
+    <h1> LUMA RENDER MONITOR </h1>
+
+
+    <p id="debug">   </p>
+
+    <div> Last updated: {{time|safe}}</div>
+
+    <h2> Links </h2>
+    <div id="links"></div>
+
+
+
+
+
+
+
+        {% for playout in data %}
+            <h2 >   {{ playout._name }}</h2>
+
+            <script>
+                var div = document.createElement('div');
+
+                    var new_link = document.createElement('a');
+                    new_link.href = "#playout_{{playout._name}}";
+                    new_link.innerHTML = "{{playout._name}}";
+                div.appendChild(new_link);
+                document.getElementById('links').appendChild(div);
+            </script>
+
+
+            <div id="playout_{{playout._name}}" class="playout container">
+
+                             <h3>Playout</h3>
+                             <div class="row row-item {{playout._status}}_row">
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-2">{{playout._name}}</div>
+                                <div class="col-sm-2">{{playout._agent}}</div>
+                                <div class="col-sm-1">{{playout._time}}</div>
+                                <div class="col-sm-1">
+                                    <span class="{{playout._status}}">{{playout._status}}</span>
+                                </div>
+
+                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{playout._filename}}')">Restart</button>
+
+                                {% if playout._logfile == "No File" %}
+                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info col-sm-1"  onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                                {% endif %}
+
+                                <div class="col-sm-3"></div>
+
+                            </div>
+
+                        <h3>Main Clip</h3>
+                        {% for subjob in playout._subjobs %}
+                            {% if subjob._type == 'MainClip' %}
+
+                            <div class="row row-item {{subjob._status}}_row">
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-2">{{subjob._name}}</div>
+                                <div class="col-sm-2">{{subjob._agent}}</div>
+                                <div class="col-sm-1">{{subjob._time}}</div>
+                                <div class="col-sm-1">
+                                    <span class="{{subjob._status}}">{{subjob._status}}</span>
+                                </div>
+
+                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+
+                                {% if subjob._logfile == "No File" %}
+                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info col-sm-1"  onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% endif %}
+
+                                <div class="col-sm-3"></div>
+
+                            </div>
+                            {% endif %}
+
+                                <h3>Sub Clips</h3>
+                                {% for subclip in subjob._subjobs %}
+                                    {% if subclip._type == 'SubClip' %}
+
+
+
+                                    <div class="row row-item {{subclip._status}}_row">
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-2">{{subclip._name}}</div>
+                                        <div class="col-sm-2">{{subclip._agent}}</div>
+                                        <div class="col-sm-1">{{subclip._time}}</div>
+                                        <div class="col-sm-1">
+                                            <span class="{{subclip._status}}">{{subclip._status}}</span>
+                                        </div>
+                                        <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subclip._filename}}')">Restart</button>
+
+                                        {% if subclip._logfile == "No File" %}
+                                            <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subclip._logfile}}')">Log</button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{subclip._logfile}}')">Log</button>
+                                        {% endif %}
+
+                                        <div class="col-sm-3"></div>
+                                    </div>
+
+
+                                    {% endif %}
+                                {% endfor %}
+
+                        {% endfor %}
+
+                        <h3>RS Renders</h3>
+                        {% for subjob in playout._subjobs %}
+                            {% if subjob._type == 'MainClip' %}
+
+                            {% else %}
+
+                            <div class="row row-item {{subjob._status}}_row">
+
+
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-2">{{subjob._name}}</div>
+                                <div class="col-sm-2">{{subjob._agent}}</div>
+                                <div class="col-sm-1">{{subjob._time}}</div>
+                                <div class="col-sm-1">
+                                    <span class="{{subjob._status}}">{{subjob._status}}</span>
+                                </div>
+
+                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+
+                                {% if not subjob._logfile == "No File" %}
+                                    <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% endif %}
+
+                                {% if subjob._status == "Busy" %}
+                                    <button type="button" class="btn btn-danger col-sm-2" onclick="KillRedshift('{{subjob._agent}}')">Kill Redshift</button>
+                                {% endif %}
+
+                                <div class="col-sm-1"></div>
+
+                            </div>
+                            {% endif %}
+
+
+                        {% endfor %}
+
+            </div>
+    <p></p>
+
+        {% endfor %}
+
+    <script>
+
+
+
+        function DeleteFile( file_path ){
+            $.post('/', { action: "Delete", path: file_path }, "");
+        }
+
+        function OpenFile( file_path ){
+            window.open("/log?path=" + file_path)
+        }
+
+        function KillRedshift( agent_name ){
+            $.post('/', { action: "KillRedshift", agent: agent_name }, "");
+        }
+
+
+
+
+    </script>
+
+
+</body>
+</html>

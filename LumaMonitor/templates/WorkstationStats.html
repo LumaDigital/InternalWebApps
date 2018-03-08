@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--<meta http-equiv="refresh" content="5">-->
+
+    <title>Workstation Stats</title>
+
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/jquery-3.2.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='dist/jqueryui/jquery-ui.min.js')}}"></script>
+
+    <link href="{{url_for('static',filename='dist/css/tabulator.min.css')}}" rel="stylesheet">
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/tabulator.min.js')}}"></script>
+
+
+</head>
+<body>
+
+    <h1> WORKSTATION STATS </h1>
+    <a href="/farm">Farm Stats</a>
+
+    <div class="example-table"></div>
+
+    <p id="debug"></p>
+
+
+
+    <script>
+        $(".example-table").tabulator({
+            fitColumns:true,
+            columns:[
+                {title:"Name", field:"Name", sorter:"alphanum",width:150},
+                {title:"CPU Temp", field:"CPUTemp", sorter:"number", align:"right", width:110,
+                            formatter:function(cell, formatterParams)
+                            {
+                                var value = cell.getValue();
+                                if(value > 90)
+                                    {
+                                        return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                                    }
+                                else if (value > 80)
+                                    {
+                                        return "<span style='color:orange; font-weight:bold;'>" + value + "</span>";
+
+                                    }
+                                else
+                                    return value;
+                            }
+                },
+                {title:"CPU Max", field:"CPUMax", sorter:"number", align:"right", width:110,
+                            formatter:function(cell, formatterParams)
+                            {
+                                var value = cell.getValue();
+                                if(value > 90)
+                                    {
+                                        return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                                    }
+                                else if (value > 80)
+                                    {
+                                        return "<span style='color:orange; font-weight:bold;'>" + value + "</span>";
+
+                                    }
+                                else
+                                    return value;
+                            }
+                },
+                {title:"CPU Load", field:"CPULoad", sorter:"number", align:"right", formatter:"progress", width:110},
+                {title:"GPU Temp", field:"GPUTemp", sorter:"number", align:"right", width:110,
+                            formatter:function(cell, formatterParams)
+                            {
+                                var value = cell.getValue();
+                                if(value > 90)
+                                    {
+                                        return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                                    }
+                                else if (value > 80)
+                                    {
+                                        return "<span style='color:orange; font-weight:bold;'>" + value + "</span>";
+
+                                    }
+                                else
+                                    return value;
+                            }
+                },
+                {title:"GPU Max", field:"GPUMax", sorter:"number", align:"right", width:110,
+                            formatter:function(cell, formatterParams)
+                            {
+                                var value = cell.getValue();
+                                if(value > 90)
+                                    {
+                                        return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                                    }
+                                else if (value > 80)
+                                    {
+                                        return "<span style='color:orange; font-weight:bold;'>" + value + "</span>";
+
+                                    }
+                                else
+                                    return value;
+                            }
+                },
+                {title:"GPU Load", field:"GPULoad", sorter:"number", align:"right", formatter:"progress", width:110},
+                {title:"static/dist/img/XSI.png", field:"XSI", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"static/dist/img/Houdini.png", field:"Houdini", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"static/dist/img/Mantra.png", field:"Mantra", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"static/dist/img/Redshift.png", field:"Redshift", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"static/dist/img/Ethereum.png", field:"Ethereum", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"static/dist/img/RPMAgent.png", field:"RPMAgent", sorter:"string", formatter:"tick", width:40, titleFormatter:"image"},
+                {title:"Updated", field:"Updated", sorter:"string",
+                        mutator:function(value, data, type, mutatorParams, cell){
+                            var d = new Date();
+                            var n = d.getTime();
+                            var since_update = parseInt((n - parseInt(value)) / 1000);
+
+                            if (since_update > 120)
+                            {
+                                var s = new Date(value);
+                                return "OFFLINE since " + s.toLocaleString();
+
+                            }
+                            return since_update ;
+                        },
+                        formatter:function(cell, formatterParams)
+                            {
+                                var value = cell.getValue();
+                                if(value < 60)
+                                    {
+                                        return "<span style='color:green; font-weight:bold;'>" + value + "s</span>";
+                                    }
+                                else
+                                    return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                            }
+                }
+
+
+            ]
+
+        });
+
+
+
+        $("#example-table").tabulator("setSort", "Name", "asc");
+
+        function Refresh_Table()
+        {
+            $.getJSON('/updateworkstations', "",
+                function(jsondata) {
+                    $(".example-table").tabulator("setData", jsondata);
+                });
+            setTimeout( Refresh_Table, 2000);
+        }
+
+       setTimeout( Refresh_Table, 2000);
+
+    </script>
+
+
+</body>
+</html>

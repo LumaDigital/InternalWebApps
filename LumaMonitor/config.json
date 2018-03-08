@@ -1,0 +1,20 @@
+{
+  "Config" :
+  {
+    "Server" : "127.0.0.1",
+    "Port" : 9091,
+    "Processes" :
+      [
+        {"XSI" : "XSIBATCH.exe"},
+        {"Houdini" : "hython.exe"},
+        {"Mantra" : "mantra.exe"},
+        {"Ethereum" : "ethminer.exe"},
+		{"Redshift" : "redshiftCmdLine.exe"},
+        {"RPMAgent" : "RPMAgent.exe"}
+      ],
+    "AutoStart_Miner": false,
+    "Miner_Path" : "D:/Etherium/eth-proxy/Mine.bat",
+    "Miner_Process_Name" : "ethminer.exe",
+    "Miner_Pause_When_Running" : "redshiftCmdLine.exe"
+  }
+}
