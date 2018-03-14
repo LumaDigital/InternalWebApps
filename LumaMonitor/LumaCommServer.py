@@ -1,9 +1,5 @@
-import os
 import socket
 import threading
-import sys
-from time import sleep
-import json
 import ast
 import logging
 
@@ -15,6 +11,8 @@ class LumaCommServer:
 
     host = "0.0.0.0"
     port = 9091
+
+    previous_connection_succeeded = True
 
     def __init__(self, host='0.0.0.0', port=9091):
         self.host = host
@@ -34,9 +32,12 @@ class LumaCommServer:
 
             # print "Sent:     {}".format(msg)
             # print "Received: {}".format(received)
+            self.previous_connection_succeeded = True
 
         except IOError as e:
-            logging.warning("I/O error({0}): {1}".format(e.errno, e.strerror));
+            if self.previous_connection_succeeded:
+                logging.warning("I/O error({0}): {1}".format(e.errno, e.strerror));
+                self.previous_connection_succeeded = False
         finally:
             sock.close()
 

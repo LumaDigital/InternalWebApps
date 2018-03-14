@@ -89,7 +89,10 @@ def get_gpu_load():
             load += sensor.Value
             count = count + 1
 
-    return load / count
+    if (count == 0):
+        return -1
+    else:
+        return load / count
 
 
 def generate_json(process_list):
