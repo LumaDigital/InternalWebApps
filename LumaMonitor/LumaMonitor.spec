@@ -4,11 +4,11 @@ block_cipher = None
 
 include_files =[ ('config.json', '.') , ('Temperature.ico', '.'), ('StartClient.bat', '.')]
 
-a = Analysis(['Main.py'],
-             pathex=['D:\\Repos\\LumaProcessManager'],
+a = Analysis(['Main.py','Monitor.py','LumaCommServer.py','ProcessManager.py'],
+             pathex=['D:\\Repos\\InternalWebApps\\LumaMonitor', 'C:\\Python27\\Lib\\site-packages', 'C:\\Users\\johanvs\\venv\\Lib\\site-packages'],
              binaries=[],
              datas= include_files,
-             hiddenimports=[],
+             hiddenimports=['wmi','psutil'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

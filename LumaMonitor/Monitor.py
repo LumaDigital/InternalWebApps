@@ -1,10 +1,9 @@
-import wmi
 import os
 import socket
 import time
 import json
-
 import ProcessManager
+import wmi
 
 w = wmi.WMI(namespace="root\OpenHardwareMonitor")
 

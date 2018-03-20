@@ -14,16 +14,21 @@ def process_running(name):
 
 
 def FavourProcess(high_priority_app, low_priority_app):
+    high_running = False
+    low_running = False
 
     # print "checking processes"
+    # Check if high priority process is running, and exit it not
     high_running = process_running(high_priority_app) == "True"
-    low_running = process_running(low_priority_app) == "True"
-    # print "High: " + str(high_running)
-    # print "Low: " + str(low_running)
+
+    # High priority process is running, so check if any low priority ones are running as well
+    for process_name in high_priority_app:
+        if process_running(process_name) == "True":
+            low_running = True
+            break
 
     if high_running and low_running:
         kill_process(low_priority_app)
-
     elif not high_running and not low_running:
         if autostart_low_priority_app:
             start_process(low_priority_app_name)
