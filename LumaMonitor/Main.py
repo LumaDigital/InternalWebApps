@@ -29,13 +29,25 @@ ProcessManager.low_priority_app_name = config_file['Config']['Miner_Path']
 miner_process_name = config_file['Config']['Miner_Process_Name']
 miner_pause_when_running = config_file['Config']['Miner_Pause_When_Running']
 
-
+hardware_monitor = config_file['Config']['Hardware_Monitor']
+luma_monitor = config_file['Config']['LumaMonitor']
 
 # Start Log file
 logging.basicConfig(filename='main.log', filemode='w', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logging.info("Configured to send data to " + host + " on port " + str(port))
 # sys.stdout = open('stdout.txt', 'w')
 
+# Check if OpenHardwareMonitor is running
+if not ProcessManager.process_running(hardware_monitor):
+    logging.info("Open Hardware Monitor not Running. Shutting Down ...")
+    keep_running = False
+    sys.exit(0)
+
+# Check if another instance of LumaMonitor is running
+if ProcessManager.process_count(luma_monitor) > 1:
+    logging.info("LumaMonitor already running. Shutting Down ...")
+    keep_running = False
+    sys.exit(0)
 
 # Start Server Comms
 logging.info("Attempting to start server")

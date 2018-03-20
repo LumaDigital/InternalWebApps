@@ -20,6 +20,8 @@
          "redshiftCmdLine.exe",
          "hython.exe"
        ],
-    "Update_Frequency_Seconds" : 2
+    "Update_Frequency_Seconds" : 2,
+    "Hardware_Monitor" : "OpenHardwareMonitor.exe",
+    "LumaMonitor" : "LumaMonitor.exe"
   }
 }

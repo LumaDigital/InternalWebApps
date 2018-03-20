@@ -115,7 +115,7 @@ def generate_json(process_list):
             process_exe = item[process_name]
 
             running = ProcessManager.process_running(process_exe)
-            data[process_name] = running
+            data[process_name] = str(running)
 
     json_data = json.dumps(data)
     # print json_data

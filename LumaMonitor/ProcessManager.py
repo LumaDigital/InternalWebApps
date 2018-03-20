@@ -5,12 +5,20 @@ import psutil
 autostart_low_priority_app = False
 low_priority_app_name = ""
 
+
+def process_count(name):
+    count = 0
+    for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
+        if name == p.info['name']:
+            count += 1
+    return count
+
 def process_running(name):
     "Return True if a process is found by the same name"
     for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
         if name == p.info['name']:
-            return "True"
-    return "False"
+            return True
+    return False
 
 
 def FavourProcess(high_priority_app, low_priority_app):
@@ -19,11 +27,11 @@ def FavourProcess(high_priority_app, low_priority_app):
 
     # print "checking processes"
     # Check if high priority process is running, and exit it not
-    high_running = process_running(high_priority_app) == "True"
+    high_running = process_running(high_priority_app)
 
     # High priority process is running, so check if any low priority ones are running as well
     for process_name in high_priority_app:
-        if process_running(process_name) == "True":
+        if process_running(process_name):
             low_running = True
             break
 
