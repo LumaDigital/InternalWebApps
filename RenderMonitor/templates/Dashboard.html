@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!--<meta http-equiv="refresh" content="20">-->
 
     <title>Render Monitor</title>
-
 
     <script type="text/javascript" src="{{url_for('static',filename='dist/js/jquery-3.2.1.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='dist/jqueryui/jquery-ui.min.js')}}"></script>
@@ -27,7 +25,6 @@
 
     <h1> LUMA RENDER MONITOR </h1>
 
-
     <p id="debug">   </p>
 
     <div> Last updated: {{time|safe}}</div>
@@ -40,9 +37,10 @@
 
 
 
-
+        <!-- sieves through all available playouts -->
         {% for playout in data %}
-            <h2 >   {{ playout._name }}</h2>
+
+            <h2 class="default">   {{ playout._name }}</h2>
 
             <script>
                 var div = document.createElement('div');
@@ -54,16 +52,17 @@
                 document.getElementById('links').appendChild(div);
             </script>
 
-
+            <!--Div used to encapsulate playout information -->
             <div id="playout_{{playout._name}}" class="playout container">
 
-                             <h3>Playout</h3>
-                             <div class="row row-item {{playout._status}}_row">
-                                <div class="col-sm-1"></div>
-                                <div class="col-sm-2">{{playout._name}}</div>
-                                <div class="col-sm-2">{{playout._agent}}</div>
-                                <div class="col-sm-1">{{playout._time}}</div>
-                                <div class="col-sm-1">
+                             <h3 class="default">Playout</h3>
+                             <div class="row row-item {{playout._status}}_row default">
+                                <div class="col-sm-2 default">{{playout._name}}</div>
+                                 <div class="col-sm-1 default"></div>
+                                 <div class="col-sm-2 default"></div>
+                                <div class="col-sm-2 default">{{playout._agent}}</div>
+                                <div class="col-sm-1 default">{{playout._time}}</div>
+                                <div class="col-sm-1 default">
                                     <span class="{{playout._status}}">{{playout._status}}</span>
                                 </div>
 
@@ -79,16 +78,17 @@
 
                             </div>
 
-                        <h3>Main Clip</h3>
+                        <h3 class="default">Main Clip</h3>
                         {% for subjob in playout._subjobs %}
                             {% if subjob._type == 'MainClip' %}
 
-                            <div class="row row-item {{subjob._status}}_row">
-                                <div class="col-sm-1"></div>
-                                <div class="col-sm-2">{{subjob._name}}</div>
-                                <div class="col-sm-2">{{subjob._agent}}</div>
-                                <div class="col-sm-1">{{subjob._time}}</div>
-                                <div class="col-sm-1">
+                            <div class="row row-item {{subjob._status}}_row default">
+                                <div class="col-sm-2 default">{{subjob._name}}</div>
+                                <div class="col-sm-1 default"></div>
+                                <div class="col-sm-2 default"></div>
+                                <div class="col-sm-2 default">{{subjob._agent}}</div>
+                                <div class="col-sm-1 default">{{subjob._time}}</div>
+                                <div class="col-sm-1 default">
                                     <span class="{{subjob._status}}">{{subjob._status}}</span>
                                 </div>
 
@@ -105,18 +105,20 @@
                             </div>
                             {% endif %}
 
-                                <h3>Sub Clips</h3>
+                                {% if subjob._type == 'MainClip' %}
+                                    <h3 class="default">Sub Clips</h3>
+                                {% endif %}
+
                                 {% for subclip in subjob._subjobs %}
                                     {% if subclip._type == 'SubClip' %}
 
-
-
-                                    <div class="row row-item {{subclip._status}}_row">
-                                        <div class="col-sm-1"></div>
-                                        <div class="col-sm-2">{{subclip._name}}</div>
-                                        <div class="col-sm-2">{{subclip._agent}}</div>
-                                        <div class="col-sm-1">{{subclip._time}}</div>
-                                        <div class="col-sm-1">
+                                    <div class="row row-item {{subclip._status}}_row default">
+                                        <div class="col-sm-2 default">{{subclip._name}}</div>
+                                        <div class="col-sm-2 default"></div>
+                                        <div class="col-sm-2 col-sm-pull-1 default additionalinfo">{{playout._splitactionrange}}</div>
+                                        <div class="col-sm-1 default col-sm-pull-1">{{subclip._agent}}</div>
+                                        <div class="col-sm-1 default">{{subclip._time}}</div>
+                                        <div class="col-sm-1 default">
                                             <span class="{{subclip._status}}">{{subclip._status}}</span>
                                         </div>
                                         <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subclip._filename}}')">Restart</button>
@@ -136,33 +138,33 @@
 
                         {% endfor %}
 
-                        <h3>RS Renders</h3>
-                        {% for subjob in playout._subjobs %}
-                            {% if subjob._type == 'MainClip' %}
+                        <h3 class="default">RS Renders</h3>
+                        {% for render_job in playout._subjobs %}
+
+                            {% if render_job._type == 'MainClip' %}
 
                             {% else %}
-
-                            <div class="row row-item {{subjob._status}}_row">
-
-
-                                <div class="col-sm-1"></div>
-                                <div class="col-sm-2">{{subjob._name}}</div>
-                                <div class="col-sm-2">{{subjob._agent}}</div>
-                                <div class="col-sm-1">{{subjob._time}}</div>
-                                <div class="col-sm-1">
-                                    <span class="{{subjob._status}}">{{subjob._status}}</span>
+                            <div class="row row-item {{render_job._status}}_row default">
+                                <div class="frame_heading default additionalinfo">Frame:</div>
+                                <div class="col-sm-1 default"></div>
+                                <div class="col-sm-2 default">{{render_job._name}}</div>
+                                <div class="col-sm-2 default additionalinfo">{{render_job._previewoption}}</div>
+                                <div class="col-sm-2 default">{{render_job._agent}}</div>
+                                <div class="col-sm-1 default">{{render_job._time}}</div>
+                                <div class="col-sm-1 default">
+                                    <span class="{{render_job._status}}">{{render_job._status}}</span>
                                 </div>
 
-                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{render_job._filename}}')">Restart</button>
 
-                                {% if not subjob._logfile == "No File" %}
-                                    <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% if not render_job._logfile == "No File" %}
+                                    <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{render_job._logfile}}')">Log</button>
                                 {% else %}
-                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{render_job._logfile}}')">Log</button>
                                 {% endif %}
 
-                                {% if subjob._status == "Busy" %}
-                                    <button type="button" class="btn btn-danger col-sm-2" onclick="KillRedshift('{{subjob._agent}}')">Kill Redshift</button>
+                                {% if render_job._status == "Busy" %}
+                                    <button type="button" class="btn btn-danger" onclick="KillRedshift('{{render_job._agent}}')">&nbsp&nbspKill RS&nbsp&nbsp</button>
                                 {% endif %}
 
                                 <div class="col-sm-1"></div>
@@ -170,8 +172,40 @@
                             </div>
                             {% endif %}
 
+                        {% endfor %}
+
+                        {% if not playout._ispreview %}
+                        <h3>PNG Composits</h3>
+                        {% for render_job in playout._subjobs %}
+
+                            {% if render_job._type == 'MainClip' %}
+
+                            {% else %}
+                            <div class="row row-item {{render_job._status}}_row default">
+
+                                <div class="frame_heading default additionalinfo">Frame:</div>
+                                <div class="col-sm-1 default"></div>
+                                <div class="col-sm-2 default">{{render_job._name}}</div>
+                                <div class="col-sm-2 default"></div>
+                                <div class="col-sm-2 default">{{render_job._agent}}</div>
+                                <div class="col-sm-1 default">
+                                    <span></span>
+                                </div>
+
+                                {% if render_job._missing == True %}
+                                    <div class="col-sm-4 default missing">{{render_job._missingstring}}</div>
+                                {% else %}
+                                    <div class="col-sm-2 default hasfiles">{{render_job._missingstring}}</div>
+                                {% endif %}
+
+                                <div class="col-sm-1"></div>
+
+                            </div>
+                            {% endif %}
 
                         {% endfor %}
+                        {% endif %}
+
 
             </div>
     <p></p>

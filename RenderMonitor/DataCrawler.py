@@ -1,13 +1,13 @@
 import fnmatch
 import os
 import json
-
+import glob
 import time
 
 import JobInfo
 import sys
+import Config
 
-basedir = "Z:\\"
 data = []
 new_data = []
 updated_at = 0
@@ -15,7 +15,7 @@ updated_at = 0
 def getjobs():
     all_jobs = []
 
-    playout_jobs = find_children(basedir, 'AnimationRecordingInput', '*.json.job')
+    playout_jobs = find_children(Config.BASE_DIR, 'AnimationRecordingInput', '*.json.job')
 
     for playout in playout_jobs:
 
@@ -24,13 +24,15 @@ def getjobs():
         done = 0
 
         clip_job = 0
-        clip_job = find_child(basedir, 'AnimationRecordingOutput', playout._name + '.clip.job')
+        clip_job = find_child(Config.BASE_DIR, 'AnimationRecordingOutput', playout._name + '.clip.job')
         if not clip_job == 0:
             playout.add_job(clip_job)
             total += 1
 
         subclip_jobs = 0
-        subclip_jobs = find_children(basedir, 'SplitRenderingOutput', playout._name + '*.json.job')
+        subclip_jobs = find_children(Config.BASE_DIR, 'SplitRenderingOutput', playout._name + '*.json.job')
+
+        find_splitaction_framerange(playout)
 
         try:
             if not subclip_jobs == 0 and not clip_job == 0:
@@ -39,15 +41,33 @@ def getjobs():
         except:
             print "Unexpected error:", sys.exc_info()[0]
 
-        render_folder = os.path.join('RenderingOutput/' + playout._name)
-        render_jobs = find_children(basedir, render_folder, '*.rs.job')
         count = -100
+        render_folder = os.path.join('RenderingOutput/' + playout._name)
+        render_jobs = find_children(Config.BASE_DIR, render_folder, '*.rs.job')
+        render_composits = find_pngs(playout)
+
+        playout._ispreview = True
+
+        if(len(render_jobs)<=0):
+            playout_render_folder = os.path.join(Config.BASE_DIR, render_folder);
+            render_jobs = find_children(playout_render_folder, "", '*.job')
+            playout._ispreview = False
 
         for render_job in render_jobs:
-            frame = render_job._filename.split("/")
-            frame = frame[-2]
-            render_job._name = "RS Frame " + frame
-            render_job._frame = int(frame)
+
+            if (playout._ispreview):
+                dir_list = render_job._filename.split("/")
+                frame = dir_list[-2]
+                render_job._frame = int(frame)
+                render_job._name = frame
+                render_job._previewoption="Preview"
+            else:
+                dir_list = render_job._filename.split("/")
+                frame = dir_list[-1]
+                frame = frame[0:-4]
+                render_job._frame = int(frame)
+                render_job._name = frame
+                find_missing_splitaction_pngs(render_job, playout)
 
             if (count < 0):
                 count = render_job._frame
@@ -73,8 +93,8 @@ def getjobs():
     return all_jobs
 
 
-def find_child(basedir, subdir, lookfor):
-    search_dir = os.path.join(basedir, subdir)
+def find_child(BASE_DIR, subdir, lookfor):
+    search_dir = os.path.join(BASE_DIR, subdir)
     for root, dirnames, filenames in os.walk(search_dir):
         if (lookfor) in filenames:
             file = os.path.join(root, lookfor)
@@ -84,9 +104,9 @@ def find_child(basedir, subdir, lookfor):
     return 0
 
 
-def find_children(basedir, subdir, lookfor):
+def find_children(BASE_DIR, subdir, lookfor):
     list = []
-    search_dir = os.path.join(basedir, subdir)
+    search_dir = os.path.join(BASE_DIR, subdir)
     for root, dirnames, filenames in os.walk(search_dir):
         for filename in fnmatch.filter(filenames, lookfor):
             file = os.path.join(root, filename)
@@ -95,16 +115,62 @@ def find_children(basedir, subdir, lookfor):
             list.append(job)
     return list
 
+def find_splitaction_framerange(playout):
+    subclip_path = os.path.join(Config.BASE_DIR, 'SplitRenderingOutput')
+
+    playout._splitactionrange = ""
+    for root, dirnames, filenames in os.walk(subclip_path):
+        filepath = ""
+        for filename in fnmatch.filter(filenames, playout._name + '*.json'):
+            temppath = os.path.join(root, filename)
+            filepath = temppath.replace("\\", "/")
+            jsondata = json.load(open(filepath))
+            playout._splitactionrange = str(jsondata['_from_frame']) +" - " +str(jsondata['_to_frame'])
+
+# Gets all available pngs from "/CompositingOutput
+def find_pngs(playout):
+    list = []
+    composite_folder = os.path.join('CompositingOutput/' + playout._name)
+    path_string = os.path.join(Config.BASE_DIR, composite_folder)
+
+    if os.path.isdir(path_string):
+        os.chdir(path_string)
+        list = glob.glob('*.png')
+
+    return list
+
+# Checks if any pngs are missing for each frame
+def find_missing_splitaction_pngs(renderjob, playout):
+
+    if len(str(renderjob._name)) < 4:
+        padded_frame = renderjob._name.zfill(4) + ".png"
+
+    composite_folder = os.path.join(Config.BASE_DIR, 'CompositingOutput/' + playout._name)
+
+    if os.path.isdir(composite_folder):
+
+        expected_elements = ["Light", "Main", "Map", "Stencil", "UV"]
+        missing_elements = []
+        renderjob._missing = False
+
+        for element in expected_elements:
+            element_path = os.path.join(composite_folder, element + "." + padded_frame)
+            if not os.path.exists(element_path):
+                renderjob._missing = True
+                missing_elements.append(element)
+
+        if renderjob._missing:
+            renderjob._missingstring =" | " + " | ".join(missing_elements) + " | "
+        else:
+            renderjob._missingstring = "All Files"
 
 def update():
-    # global data
-    # data = find_atomic_jobs()
-
     global data
     data = getjobs()
 
     global updated_at
     updated_at = time.strftime("%d/%m/%y %H:%M:%S")
-    # print data
+
+
 
 
