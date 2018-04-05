@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-include_files =[ ('config.json', '.') , ('Temperature.ico', '.'), ('StartClient.bat', '.')]
+include_files =[ ('config.json', '.') , ('Temperature.ico', '.'), ('StartClient.bat', '.'), ('devcon.exe', '.')]
 
 a = Analysis(['Main.py','Monitor.py','LumaCommServer.py','ProcessManager.py'],
              pathex=['D:\\Repos\\InternalWebApps\\LumaMonitor', 'C:\\Python27\\Lib\\site-packages', 'C:\\Users\\johanvs\\venv\\Lib\\site-packages'],

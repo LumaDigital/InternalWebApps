@@ -4,9 +4,13 @@ import psutil
 import sys
 import logging
 import traceback
+import time
 
 autostart_low_priority_app = False
 low_priority_app_name = ""
+
+wait_time = 30
+current_time = 0
 
 
 def process_count(name):
@@ -31,6 +35,7 @@ def process_running(name):
 
 
 def FavourProcess(high_priority_app, low_priority_app):
+    global current_time
     high_running = False
     low_running = False
 
@@ -44,12 +49,28 @@ def FavourProcess(high_priority_app, low_priority_app):
             high_running = True
             break
 
+
     if high_running and low_running:
         kill_process(low_priority_app)
     elif not high_running and not low_running:
         if autostart_low_priority_app:
-            start_process(low_priority_app_name)
+            start_Low_priority()
     return
+
+def start_Low_priority():
+    global current_time
+    global wait_time
+
+    if current_time == 0:
+        current_time = time.time()
+    elif current_time + wait_time <= time.time():
+        subprocess.Popen("devcon disable =display", shell=True)
+        time.sleep(5)
+        subprocess.Popen("devcon enable =display", shell=True)
+        time.sleep(5)
+        start_process(low_priority_app_name)
+        current_time = 0
+
 
 
 def kill_process(name):
