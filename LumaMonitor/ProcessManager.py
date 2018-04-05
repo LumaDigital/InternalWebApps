@@ -1,6 +1,9 @@
 import subprocess
 import os
 import psutil
+import sys
+import logging
+import traceback
 
 autostart_low_priority_app = False
 low_priority_app_name = ""
@@ -14,11 +17,17 @@ def process_count(name):
     return count
 
 def process_running(name):
-    "Return True if a process is found by the same name"
-    for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
-        if name == p.info['name']:
-            return True
-    return False
+    try:
+        "Return True if a process is found by the same name"
+        for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
+            if name == p.info['name']:
+                return True
+        return False
+    except:
+        e = sys.exc_info()[0]
+        logging.error(traceback.format_exc())
+        print "Error: %s" % e
+        return False
 
 
 def FavourProcess(high_priority_app, low_priority_app):

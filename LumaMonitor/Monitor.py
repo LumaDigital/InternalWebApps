@@ -43,7 +43,8 @@ def get_cpu_load():
         if sensor.SensorType == u'Load' and 'CPU Core' in sensor.Name:
             load += sensor.Value
             count = count + 1
-
+    if count == 0:
+        return -1
     return load / count
 
 def get_cpu_temp_max_history():
@@ -88,7 +89,7 @@ def get_gpu_load():
             load += sensor.Value
             count = count + 1
 
-    if (count == 0):
+    if count == 0:
         return -1
     else:
         return load / count
