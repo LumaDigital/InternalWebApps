@@ -15,6 +15,7 @@
     "AutoStart_Miner": false,
     "Miner_Path" : "D:/Etherium/eth-proxy/Mine.bat",
     "Miner_Process_Name" : "ethminer.exe",
+    "Miner_Wait_Time" : 120,
     "Miner_Pause_When_Running" :
        [
          "redshiftCmdLine.exe",

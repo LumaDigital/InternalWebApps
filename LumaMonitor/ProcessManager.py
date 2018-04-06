@@ -12,6 +12,10 @@ low_priority_app_name = ""
 wait_time = 30
 current_time = 0
 
+def set_wait_time(seconds):
+    global wait_time
+    wait_time = seconds
+
 
 def process_count(name):
     count = 0

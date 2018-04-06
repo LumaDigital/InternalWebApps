@@ -28,6 +28,8 @@ ProcessManager.autostart_low_priority_app = config_file['Config']['AutoStart_Min
 ProcessManager.low_priority_app_name = config_file['Config']['Miner_Path']
 miner_process_name = config_file['Config']['Miner_Process_Name']
 miner_pause_when_running = config_file['Config']['Miner_Pause_When_Running']
+miner_wait_time = config_file['Config']['Miner_Wait_Time']
+ProcessManager.set_wait_time(miner_wait_time)
 
 hardware_monitor = config_file['Config']['Hardware_Monitor']
 luma_monitor = config_file['Config']['LumaMonitor']
