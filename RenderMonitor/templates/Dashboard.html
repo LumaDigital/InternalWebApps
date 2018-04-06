@@ -148,8 +148,20 @@
                                 <div class="frame_heading default additionalinfo">Frame:</div>
                                 <div class="col-sm-1 default"></div>
                                 <div class="col-sm-2 default">{{render_job._name}}</div>
-                                <div class="col-sm-2 default additionalinfo">{{render_job._previewoption}}</div>
-                                <div class="col-sm-2 default">{{render_job._agent}}</div>
+
+                                {% if not playout._ispreview %}
+                                    {% if render_job._missing == True %}
+                                        <div class="col-sm-3 default col-sm-pull-1 missing_files text-center">{{render_job._missingstring}}</div>
+                                        <div class="col-sm-1 default col-sm-pull-1">{{render_job._agent}}</div>
+                                    {% else %}
+                                        <div class="col-sm-2 default hasfiles">{{render_job._missingstring}}</div>
+                                        <div class="col-sm-2 default">{{render_job._agent}}</div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="col-sm-2 default additionalinfo">{{render_job._previewoption}}</div>
+                                    <div class="col-sm-2 default">{{render_job._agent}}</div>
+                                {% endif %}
+
                                 <div class="col-sm-1 default">{{render_job._time}}</div>
                                 <div class="col-sm-1 default">
                                     <span class="{{render_job._status}}">{{render_job._status}}</span>
@@ -173,40 +185,6 @@
                             {% endif %}
 
                         {% endfor %}
-
-                        {% if not playout._ispreview %}
-                        <h3>PNG Composits</h3>
-                        {% for render_job in playout._subjobs %}
-
-                            {% if render_job._type == 'MainClip' %}
-
-                            {% else %}
-                            <div class="row row-item {{render_job._status}}_row default">
-
-                                <div class="frame_heading default additionalinfo">Frame:</div>
-                                <div class="col-sm-1 default"></div>
-                                <div class="col-sm-2 default">{{render_job._name}}</div>
-                                <div class="col-sm-2 default"></div>
-                                <div class="col-sm-2 default">{{render_job._agent}}</div>
-                                <div class="col-sm-1 default">
-                                    <span></span>
-                                </div>
-
-                                {% if render_job._missing == True %}
-                                    <div class="col-sm-4 default missing">{{render_job._missingstring}}</div>
-                                {% else %}
-                                    <div class="col-sm-2 default hasfiles">{{render_job._missingstring}}</div>
-                                {% endif %}
-
-                                <div class="col-sm-1"></div>
-
-                            </div>
-                            {% endif %}
-
-                        {% endfor %}
-                        {% endif %}
-
-
             </div>
     <p></p>
 

@@ -93,6 +93,10 @@ background-color: white;
     color: #33ba2c;
 }
 
+.missing_files{
+    color: red;
+}
+
 body {
     background-image: url("Luma.png");
     background-repeat: no-repeat;

@@ -96,7 +96,7 @@ def getjobs():
 def find_child(BASE_DIR, subdir, lookfor):
     search_dir = os.path.join(BASE_DIR, subdir)
     for root, dirnames, filenames in os.walk(search_dir):
-        if (lookfor) in filenames:
+        if lookfor.lower() in [x.lower() for x in filenames]:
             file = os.path.join(root, lookfor)
             job = JobInfo.JobInfo()
             job.create_from_file(file)
@@ -160,7 +160,7 @@ def find_missing_splitaction_pngs(renderjob, playout):
                 missing_elements.append(element)
 
         if renderjob._missing:
-            renderjob._missingstring =" | " + " | ".join(missing_elements) + " | "
+            renderjob._missingstring =" | ".join(missing_elements)
         else:
             renderjob._missingstring = "All Files"
 
