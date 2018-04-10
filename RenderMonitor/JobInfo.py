@@ -13,6 +13,10 @@ class JobInfo:
     _frame = 0
     _subjobs = []
 
+    # Special case where _framerange is set in DataCrawler.py
+    # as the data is contained in splitaction .json file (not json.job)
+    _framerange = "No Range"
+
     def __init__(self):
         return
         # , jobtype, name, status, time, agent):
@@ -21,7 +25,6 @@ class JobInfo:
         # self._status = status
         # self._time = time
         # self._agent = agent
-
 
     def create_from_file(self, filename):
         data = json.load(open(filename))

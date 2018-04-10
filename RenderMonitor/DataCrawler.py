@@ -32,8 +32,6 @@ def getjobs():
         subclip_jobs = 0
         subclip_jobs = find_children(Config.BASE_DIR, 'SplitRenderingOutput', playout._name + '*.json.job')
 
-        find_splitaction_framerange(playout)
-
         try:
             if not subclip_jobs == 0 and not clip_job == 0:
                 clip_job.add_jobs(subclip_jobs)
@@ -112,20 +110,15 @@ def find_children(BASE_DIR, subdir, lookfor):
             file = os.path.join(root, filename)
             job = JobInfo.JobInfo()
             job.create_from_file(file)
+
+            if subdir == 'SplitRenderingOutput':
+                temppath = os.path.join(root, filename[:-4])
+                filepath = temppath.replace("\\", "/")
+                jsondata = json.load(open(filepath))
+                job._framerange = str(jsondata['_from_frame']) + " - " + str(jsondata['_to_frame'])
+
             list.append(job)
     return list
-
-def find_splitaction_framerange(playout):
-    subclip_path = os.path.join(Config.BASE_DIR, 'SplitRenderingOutput')
-
-    playout._splitactionrange = ""
-    for root, dirnames, filenames in os.walk(subclip_path):
-        filepath = ""
-        for filename in fnmatch.filter(filenames, playout._name + '*.json'):
-            temppath = os.path.join(root, filename)
-            filepath = temppath.replace("\\", "/")
-            jsondata = json.load(open(filepath))
-            playout._splitactionrange = str(jsondata['_from_frame']) +" - " +str(jsondata['_to_frame'])
 
 # Gets all available pngs from "/CompositingOutput
 def find_pngs(playout):
