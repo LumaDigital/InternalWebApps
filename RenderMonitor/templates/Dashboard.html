@@ -29,6 +29,11 @@
 
     <div> Last updated: {{time|safe}}</div>
 
+    <h2> Status </h2>
+    {% for i in summary %}
+        <div class={{i}}>{{i}} : {{summary[i]}}</div>
+    {% endfor %}
+
     <h2> Links </h2>
     <div id="links"></div>
 

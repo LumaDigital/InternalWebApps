@@ -12,6 +12,9 @@ data = []
 new_data = []
 updated_at = 0
 
+status_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
+current_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
+
 def getjobs():
     all_jobs = []
 
@@ -42,7 +45,6 @@ def getjobs():
         count = -100
         render_folder = os.path.join('RenderingOutput/' + playout._name)
         render_jobs = find_children(Config.BASE_DIR, render_folder, '*.rs.job')
-        render_composits = find_pngs(playout)
 
         playout._ispreview = True
 
@@ -90,6 +92,18 @@ def getjobs():
 
     return all_jobs
 
+def AddToStatusTotal(BASE_DIR, subdir):
+    file = os.path.join(BASE_DIR, subdir)
+
+    file_Path = file.replace("\\", "/")
+    json_Data = json.load(open(file_Path))
+    job_State = json_Data['_job_state']
+
+    switch_Dictionary = {0: 'Queued', 1: 'Busy', 2: 'Done', 3: 'Error'}
+
+    status_total_summary[switch_Dictionary[job_State]] += 1
+
+
 
 def find_child(BASE_DIR, subdir, lookfor):
     search_dir = os.path.join(BASE_DIR, subdir)
@@ -98,6 +112,7 @@ def find_child(BASE_DIR, subdir, lookfor):
             file = os.path.join(root, lookfor)
             job = JobInfo.JobInfo()
             job.create_from_file(file)
+            AddToStatusTotal(root, lookfor)
             return job
     return 0
 
@@ -110,6 +125,7 @@ def find_children(BASE_DIR, subdir, lookfor):
             file = os.path.join(root, filename)
             job = JobInfo.JobInfo()
             job.create_from_file(file)
+            AddToStatusTotal(root, filename)
 
             if subdir == 'SplitRenderingOutput':
                 temppath = os.path.join(root, filename[:-4])
@@ -118,18 +134,6 @@ def find_children(BASE_DIR, subdir, lookfor):
                 job._framerange = str(jsondata['_from_frame']) + " - " + str(jsondata['_to_frame'])
 
             list.append(job)
-    return list
-
-# Gets all available pngs from "/CompositingOutput
-def find_pngs(playout):
-    list = []
-    composite_folder = os.path.join('CompositingOutput/' + playout._name)
-    path_string = os.path.join(Config.BASE_DIR, composite_folder)
-
-    if os.path.isdir(path_string):
-        os.chdir(path_string)
-        list = glob.glob('*.png')
-
     return list
 
 # Checks if any pngs are missing for each frame
@@ -159,10 +163,16 @@ def find_missing_splitaction_pngs(renderjob, playout):
 
 def update():
     global data
-    data = getjobs()
-
+    global current_total_summary
+    global status_total_summary
     global updated_at
+
+    data = getjobs()
     updated_at = time.strftime("%d/%m/%y %H:%M:%S")
+
+    current_total_summary = status_total_summary
+
+    status_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
 
 
 

@@ -47,6 +47,11 @@
     font-weight: bold;
 }
 
+.Queued {
+    color: #00b8e6;
+    font-weight: bold;
+}
+
 .Error_row {
     background-color: #ff00003b;
 }
