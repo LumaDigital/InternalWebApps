@@ -51,8 +51,10 @@ def FavourProcess(high_priority_app, low_priority_app):
     for process_name in high_priority_app:
         if process_running(process_name):
             high_running = True
-            break
 
+            # Reset the wait time for Low Priority Start
+            current_time = time.time()
+            break
 
     if high_running and low_running:
         kill_process(low_priority_app)
@@ -78,6 +80,7 @@ def start_Low_priority():
 
 
 def kill_process(name):
+    logging.info("Killing : " + name)
     os.system("taskkill /F /IM " + name)
 
 
