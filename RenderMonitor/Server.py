@@ -4,7 +4,8 @@ import threading
 import time
 import os
 import DataCrawler
-import sys
+
+import timeit
 
 
 app = Flask(__name__)
@@ -36,14 +37,16 @@ def log():
 def update_data():
 
     while True:
-
+        start = timeit.default_timer()
         try:
             print "getting data"
             DataCrawler.update()
             print "done"
-        except:
-            print "Error Occured", sys.exc_info()[1]
+        except Exception, err:
+            print "Error Occured: " + err
 
+        stop = timeit.default_timer()
+        print stop - start
         time.sleep(30)
 
 
