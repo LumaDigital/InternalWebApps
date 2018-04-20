@@ -43,7 +43,7 @@ def update_data():
             DataCrawler.update()
             print "done"
         except Exception, err:
-            print "Error Occured: " + err
+            print "Error Occured: " + str(err)
 
         stop = timeit.default_timer()
         print stop - start

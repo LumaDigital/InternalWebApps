@@ -14,6 +14,7 @@ except ImportError:
 data = []
 new_data = []
 updated_at = 0
+playout_job_framerange = {'Lowest': -1, 'Highest': -1}
 
 status_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
 current_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
@@ -37,8 +38,10 @@ def getjobs():
 
             AddToStatusTotal("", clip_job_path)
 
-        # For counting frames? Why hardcoded -100?
-        count = -100
+            # Getting list of all expected frame numbers to compare for missing frames
+            expected_frames = []
+            for x in range(playout_job_framerange['Lowest'], playout_job_framerange['Highest'] + 1):
+                expected_frames.append(x)
 
         # First look for production renders
         render_folder = os.path.join('RenderingOutput/' + playout_job._name)
@@ -51,12 +54,18 @@ def getjobs():
             render_jobs = find_children(Config.BASE_DIR, render_folder, '*.rs.job')
             playout_job._ispreview = True
 
+        # All render job frames are added to an available list to compare with expected frames
+        available_frames = []
+        # Count keeping track of frame numbers
+        # Count iterates for available frames, and for each missing frame to display correct missing number
+        count = 0
         for render_job in render_jobs:
 
+            # Adding additional render_job information
             if (playout_job._ispreview):
                 dir_list = render_job._filename.split("/")
                 frame = dir_list[-2]
-                render_job._previewoption="Preview"
+                render_job._previewoption = "Preview"
             else:
                 dir_list = render_job._filename.split("/")
                 frame = dir_list[-1]
@@ -66,24 +75,49 @@ def getjobs():
             render_job._frame = int(frame)
             render_job._name = frame
 
-            if (count < 0):
-                count = render_job._frame
+            # Detecting any missing frames before the current render_job frame
+            available_frames.append(render_job._frame)
+            if render_job._frame != expected_frames[count]:
+                count = find_missing_frames(render_job, count, playout_job, expected_frames[count])
+                # delete element in expected frames to compare next render_job frame to correct index of expected frames
+                del expected_frames[count]
+                playout_job.add_job(render_job)
+            else:
+                playout_job.add_job(render_job)
+                count += 1
 
-            while (not count == int(frame)):
-               tempJob=JobInfo.JobInfo()
-               tempJob._name = "MISSING " + str(count)
-               tempJob._frame = count #int(frame)
-               tempJob._status = "MISSING"
-               tempJob._agent = "N/A"
-               playout_job.add_job(tempJob)
-               count += 1
+            # Special case for last element in index to detect for missing frames ahead of current render_job frame
+            if render_job == render_jobs[len(render_jobs)-1]:
+                if render_job._frame != expected_frames[len(expected_frames)-1]:
+                    find_missing_frames(render_job, count, playout_job, expected_frames[len(expected_frames) - 1], True)
 
-            playout_job.add_job(render_job)
-            count += 1
+        # Resetting frame ranges for new playout ranges
+        playout_job_framerange['Lowest'] = -1
+        playout_job_framerange['Highest'] = -1
 
         all_jobs.append(playout_job)
 
     return all_jobs
+
+def find_missing_frames(render_job, count, playout_job, expected_frame, last_index=False):
+
+    missing_frames_count = abs(render_job._frame - expected_frame)
+
+    for x in range(missing_frames_count):
+        temp_job = JobInfo.JobInfo()
+
+        if last_index:
+            temp_job._name = "MISSING " + str(render_job._frame + x + 1)
+        else:
+            temp_job._name = "MISSING " + str(render_job._frame - missing_frames_count + x)
+
+        temp_job._frame = count  # int(frame)
+        temp_job._status = "MISSING"
+        temp_job._agent = "N/A"
+        playout_job.add_job(temp_job)
+        count += 1
+
+    return count
 
 def AddToStatusTotal(BASE_DIR, subdir):
     file = os.path.join(BASE_DIR, subdir)
@@ -125,10 +159,25 @@ def find_children(BASE_DIR, subdir, lookfor, recursive=True):
             AddToStatusTotal("", entry.path)
 
             if "SplitRenderingOutput" in subdir:
+                global playout_job_framerange
+
                 temppath = entry.path[:-4]
                 filepath = temppath.replace("\\", "/")
                 jsondata = json.load(open(filepath))
                 job._framerange = str(jsondata['_from_frame']) + " - " + str(jsondata['_to_frame'])
+
+                lowest_frame = (jsondata['_from_frame'])
+                highest_frame = (jsondata['_to_frame'])
+
+                if playout_job_framerange['Lowest'] < 0 or playout_job_framerange['Highest'] < 0:
+                    playout_job_framerange['Lowest'] = lowest_frame
+                    playout_job_framerange['Highest'] = highest_frame
+
+                if playout_job_framerange['Lowest'] > lowest_frame:
+                    playout_job_framerange['Lowest'] = lowest_frame
+
+                if playout_job_framerange['Highest'] < highest_frame:
+                    playout_job_framerange['Highest'] = highest_frame
 
     return jobs
 
@@ -170,7 +219,3 @@ def update():
     current_total_summary = status_total_summary
 
     status_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
-
-
-
-
