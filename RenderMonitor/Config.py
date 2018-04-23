@@ -1,3 +1,2 @@
 # Global variables
-BASE_DIR = "C:/Users/VSE/Desktop/testing"
-
+BASE_DIR = "Z:/"

@@ -37,11 +37,6 @@
     <h2> Links </h2>
     <div id="links"></div>
 
-
-
-
-
-
         <!-- sieves through all available playouts -->
         {% for playout in data %}
 
@@ -60,33 +55,69 @@
             <!--Div used to encapsulate playout information -->
             <div id="playout_{{playout._name}}" class="playout container">
 
-                             <h3 class="default">Playout</h3>
-                             <div class="row row-item {{playout._status}}_row default">
-                                <div class="col-sm-2 default">{{playout._name}}</div>
-                                 <div class="col-sm-1 default"></div>
-                                 <div class="col-sm-2 default"></div>
-                                <div class="col-sm-2 default">{{playout._agent}}</div>
-                                <div class="col-sm-1 default">{{playout._time}}</div>
+                <h3 class="default">Playout</h3>
+                    <div class="row row-item {{playout._status}}_row default">
+                        <div class="col-sm-2 default">{{playout._name}}</div>
+                        <div class="col-sm-1 default"></div>
+                        <div class="col-sm-2 default"></div>
+                        <div class="col-sm-2 default">{{playout._agent}}</div>
+                        <div class="col-sm-1 default">{{playout._time}}</div>
+                        <div class="col-sm-1 default">
+                            <span class="{{playout._status}}">{{playout._status}}</span>
+                        </div>
+
+                        <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{playout._filename}}')">Restart</button>
+
+                        {% if playout._logfile == "No File" %}
+                            <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                        {% else %}
+                            <button type="button" class="btn btn-info col-sm-1"  onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                        {% endif %}
+
+                        <div class="col-sm-3"></div>
+                    </div>
+
+                <h3 class="default">Vision Video</h3>
+                    {% for subjob in playout._subjobs %}
+                        {% if subjob._type == 'Video' %}
+                            <div class="row row-item {{subjob._status}}_row default">
+                                <div class="col-sm-2 default">{{subjob._name}}</div>
+                                <div class="col-sm-1 default"></div>
+                                <div class="col-sm-2 default"></div>
+                                <div class="col-sm-2 default">{{subjob._agent}}</div>
+                                <div class="col-sm-1 default">{{subjob._time}}</div>
                                 <div class="col-sm-1 default">
-                                    <span class="{{playout._status}}">{{playout._status}}</span>
+                                    <span class="{{subjob._status}}">{{subjob._status}}</span>
                                 </div>
 
-                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{playout._filename}}')">Restart</button>
+                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
 
-                                {% if playout._logfile == "No File" %}
-                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                                {% if subjob._logfile == "No File" %}
+                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
                                 {% else %}
-                                    <button type="button" class="btn btn-info col-sm-1"  onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                                    <button type="button" class="btn btn-info col-sm-1"  onclick="OpenFile('{{subjob._logfile}}')">Log</button>
                                 {% endif %}
-
-                                <div class="col-sm-3"></div>
-
                             </div>
+                        {% endif %}
 
-                        <h3 class="default">Main Clip</h3>
-                        {% for subjob in playout._subjobs %}
-                            {% if subjob._type == 'MainClip' %}
+                        {% if playout._subjobs[0] == subjob and subjob._type != 'Video' %}
+                            <div class="row row-item Missing_row default">
+                                <div class="col-sm-2 default">Missing .vv file</div>
+                                <div class="col-sm-1 default"></div>
+                                <div class="col-sm-2 default"></div>
+                                <div class="col-sm-2 default">N/A</div>
+                                <div class="col-sm-1 default">No Time</div>
+                                <div class="col-sm-1 default">
+                                    <span>Missing</span>
+                                </div>
+                            </div>
+                        {% endif %}
 
+                        {% if 'MainClip' in subjob._type%}
+                            <h3 class="default">Main Clip</h3>
+                        {% endif %}
+
+                        {% if subjob._type == 'MainClip' %}
                             <div class="row row-item {{subjob._status}}_row default">
                                 <div class="col-sm-2 default">{{subjob._name}}</div>
                                 <div class="col-sm-1 default"></div>
@@ -108,97 +139,92 @@
                                 <div class="col-sm-3"></div>
 
                             </div>
-                            {% endif %}
+                        {% endif %}
 
-                                {% if subjob._type == 'MainClip' %}
-                                    <h3 class="default">Sub Clips</h3>
-                                {% endif %}
+                        {% if subjob._type == 'MainClip' %}
+                            <h3 class="default">Sub Clips</h3>
+                        {% endif %}
 
-                                {% for subclip in subjob._subjobs %}
-                                    {% if subclip._type == 'SubClip' %}
+                        {% for subclip in subjob._subjobs %}
+                            {% if subclip._type == 'SubClip' %}
 
-                                    <div class="row row-item {{subclip._status}}_row default">
-                                        <div class="col-sm-2 default">{{subclip._name}}</div>
-                                        <div class="col-sm-2 default"></div>
-                                        <div class="col-sm-2 col-sm-pull-1 default additionalinfo">{{subclip._framerange}}</div>
-                                        <div class="col-sm-1 default col-sm-pull-1">{{subclip._agent}}</div>
-                                        <div class="col-sm-1 default">{{subclip._time}}</div>
-                                        <div class="col-sm-1 default">
-                                            <span class="{{subclip._status}}">{{subclip._status}}</span>
-                                        </div>
-                                        <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subclip._filename}}')">Restart</button>
-
-                                        {% if subclip._logfile == "No File" %}
-                                            <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subclip._logfile}}')">Log</button>
-                                        {% else %}
-                                            <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{subclip._logfile}}')">Log</button>
-                                        {% endif %}
-
-                                        <div class="col-sm-3"></div>
+                                <div class="row row-item {{subclip._status}}_row default">
+                                    <div class="col-sm-2 default">{{subclip._name}}</div>
+                                    <div class="col-sm-2 default"></div>
+                                    <div class="col-sm-2 col-sm-pull-1 default additionalinfo">{{subclip._framerange}}</div>
+                                    <div class="col-sm-1 default col-sm-pull-1">{{subclip._agent}}</div>
+                                    <div class="col-sm-1 default">{{subclip._time}}</div>
+                                    <div class="col-sm-1 default">
+                                        <span class="{{subclip._status}}">{{subclip._status}}</span>
                                     </div>
+                                    <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{subclip._filename}}')">Restart</button>
 
-
-                                    {% endif %}
-                                {% endfor %}
-
-                        {% endfor %}
-
-                        <h3 class="default">RS Renders</h3>
-                        {% for render_job in playout._subjobs %}
-
-                            {% if render_job._type == 'MainClip' %}
-
-                            {% else %}
-                            <div class="row row-item {{render_job._status}}_row default">
-                                <div class="frame_heading default additionalinfo">Frame:</div>
-                                <div class="col-sm-1 default"></div>
-                                <div class="col-sm-2 default">{{render_job._name}}</div>
-
-                                {% if not playout._ispreview %}
-                                    {% if render_job._missing == True %}
-                                        <div class="col-sm-3 default col-sm-pull-1 missing_files text-center">{{render_job._missingstring}}</div>
-                                        <div class="col-sm-1 default col-sm-pull-1">{{render_job._agent}}</div>
+                                    {% if subclip._logfile == "No File" %}
+                                        <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{subclip._logfile}}')">Log</button>
                                     {% else %}
-                                        <div class="col-sm-2 default hasfiles">{{render_job._missingstring}}</div>
-                                        <div class="col-sm-2 default">{{render_job._agent}}</div>
+                                        <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{subclip._logfile}}')">Log</button>
                                     {% endif %}
-                                {% else %}
-                                    <div class="col-sm-2 default additionalinfo">{{render_job._previewoption}}</div>
-                                    <div class="col-sm-2 default">{{render_job._agent}}</div>
-                                {% endif %}
 
-                                <div class="col-sm-1 default">{{render_job._time}}</div>
-                                <div class="col-sm-1 default">
-                                    <span class="{{render_job._status}}">{{render_job._status}}</span>
+                                    <div class="col-sm-3"></div>
                                 </div>
 
-                                <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{render_job._filename}}')">Restart</button>
 
-                                {% if not render_job._logfile == "No File" %}
-                                    <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{render_job._logfile}}')">Log</button>
+                                {% endif %}
+                            {% endfor %}
+
+                    {% endfor %}
+
+                <h3 class="default">RS Renders</h3>
+                    {% for render_job in playout._subjobs %}
+
+                        {% if render_job._type == 'Render' or render_job._type == 'No Type' %}
+                        <div class="row row-item {{render_job._status}}_row default">
+                            <div class="frame_heading default additionalinfo">Frame:</div>
+                            <div class="col-sm-1 default"></div>
+                            <div class="col-sm-2 default">{{render_job._name}}</div>
+
+                            {% if not playout._ispreview %}
+                                {% if render_job._missing == True %}
+                                    <div class="col-sm-3 default col-sm-pull-1 missing_files text-center">{{render_job._missingstring}}</div>
+                                    <div class="col-sm-1 default col-sm-pull-1">{{render_job._agent}}</div>
                                 {% else %}
-                                    <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{render_job._logfile}}')">Log</button>
+                                    <div class="col-sm-2 default hasfiles">{{render_job._missingstring}}</div>
+                                    <div class="col-sm-2 default">{{render_job._agent}}</div>
                                 {% endif %}
-
-                                {% if render_job._status == "Busy" %}
-                                    <button type="button" class="btn btn-danger" onclick="KillRedshift('{{render_job._agent}}')">&nbsp&nbspKill RS&nbsp&nbsp</button>
-                                {% endif %}
-
-                                <div class="col-sm-1"></div>
-
-                            </div>
+                            {% else %}
+                                <div class="col-sm-2 default additionalinfo">{{render_job._previewoption}}</div>
+                                <div class="col-sm-2 default">{{render_job._agent}}</div>
                             {% endif %}
 
-                        {% endfor %}
+                            <div class="col-sm-1 default">{{render_job._time}}</div>
+                            <div class="col-sm-1 default">
+                                <span class="{{render_job._status}}">{{render_job._status}}</span>
+                            </div>
+
+                            <button type="button" class="btn btn-warning col-sm-1" onclick="DeleteFile('{{render_job._filename}}')">Restart</button>
+
+                            {% if not render_job._logfile == "No File" %}
+                                <button type="button" class="btn btn-info col-sm-1" onclick="OpenFile('{{render_job._logfile}}')">Log</button>
+                            {% else %}
+                                <button type="button" class="btn btn-default col-sm-1" disabled onclick="OpenFile('{{render_job._logfile}}')">Log</button>
+                            {% endif %}
+
+                            {% if render_job._status == "Busy" %}
+                                <button type="button" class="btn btn-danger" onclick="KillRedshift('{{render_job._agent}}')">&nbsp&nbspKill RS&nbsp&nbsp</button>
+                            {% endif %}
+
+                            <div class="col-sm-1"></div>
+
+                        </div>
+                        {% endif %}
+
+                    {% endfor %}
             </div>
     <p></p>
 
         {% endfor %}
 
     <script>
-
-
-
         function DeleteFile( file_path ){
             $.post('/', { action: "Delete", path: file_path }, "");
         }
@@ -210,12 +236,7 @@
         function KillRedshift( agent_name ){
             $.post('/', { action: "KillRedshift", agent: agent_name }, "");
         }
-
-
-
-
     </script>
-
 
 </body>
 </html>

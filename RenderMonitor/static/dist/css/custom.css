@@ -83,6 +83,10 @@ background-color: white;
 	font-weight: bold;
 }
 
+.Missing_row {
+    background-color: #e6e6e6;
+}
+
 .frame_heading {
     position: relative;
     bottom: -10px;
