@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Error Stats</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/ErrorLogging.js')}}"></script>
+
+    <link href="{{url_for('static',filename='dist/css/error_logging.css')}}" rel="stylesheet">
+
+</head>
+
+<style type="text/css">
+    #logText {
+        visibility: hidden;
+        display: none;
+    }
+</style>
+
+<body onload="displayStats();">
+    <h1 class="heading"> JOB ERROR STATISTICS </h1>
+    <br>
+    <div id="animation" class="title"></div>
+    <pre id="farms_animation" class="farms"></pre>
+    <br>
+    <div id="compositing" class="title"></div>
+    <pre id="farms_compositing" class="farms"></pre>
+    <br>
+    <div id="preview" class="title"></div>
+    <pre id="farms_preview" class="farms"></pre>
+    <br>
+    <div id="rendering" class="title"></div>
+    <pre id="farms_rendering" class="farms"></pre>
+    <br>
+    <div id="split" class="title"></div>
+    <pre id="farms_split" class="farms"></pre>
+    <br>
+    <div id="video" class="title"></div>
+    <pre id="farms_video" class="farms"></pre>
+    <br>
+
+    <!--Invisible div that is used to store the contents of rpm_log.txt-->
+    <div id="logText">{{ log }}</div>
+</body>
+</html>

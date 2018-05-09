@@ -18,6 +18,7 @@ playout_job_framerange = {'Lowest': -1, 'Highest': -1}
 
 status_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
 current_total_summary = {'Queued': 0, 'Busy': 0, 'Done': 0, 'Error': 0}
+log_text = ""
 
 def get_jobs():
     all_jobs = []
@@ -231,6 +232,10 @@ def update():
     global current_total_summary
     global status_total_summary
     global updated_at
+    global log_text
+
+    with open('C:/Users/shadow/Desktop/Test/rpm_log.txt', 'r') as myfile:
+        log_text = myfile.readlines()
 
     data = get_jobs()
     updated_at = time.strftime("%d/%m/%y %H:%M:%S")

@@ -28,6 +28,10 @@ def action():
 
     return render_template('Dashboard.html', data=DataCrawler.data, time=DataCrawler.updated_at, summary=DataCrawler.current_total_summary)
 
+@app.route("/stats", methods=['GET'])
+def stats_dashboard():
+    return render_template('StatsDashboard.html', log=DataCrawler.log_text)
+
 @app.route("/log", methods=['GET'])
 def log():
     if "path" in request.args:
