@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Render Monitor</title>
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/jquery-3.2.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='dist/jqueryui/jquery-ui.min.js')}}"></script>
+
+
+    <script type="text/javascript" src="{{url_for('static',filename='dist/js/tabulator.min.js')}}"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href="{{url_for('static',filename='dist/css/custom.css')}}" rel="stylesheet">
+
+    <title>Render Monitor</title>
+</head>
+<body ondblclick="closeTab()">
+    <br>
+    <h2 class="default"> <font color="#666666">RENDER MONITOR</font> </h2>
+    <div class="default"> Last updated: {{time|safe}}</div>
+    <h2 class="default" style="margin: 25px 0px 10px 0px"> <font>{{Playout}}</font> </h2>
+
+    <div id="info" class="infoBox" style="position: relative; min-width: 650px; width: 100%">
+
+        <h3 class="default" style="padding: 0; margin: 0px 0px 5px 0px;">Playout</h3>
+            {% for playout in data %}
+                {% if playout._name == Playout%}
+                    <div class="row row-item-small Done_row" style="padding: 5px 5px 5px 15px; white-space: nowrap; height: 22px">
+                        <div style="float: right;">
+                            <button type="button" class="btn btn-warning" style="float: left;position: relative; bottom: 2px; height: 16px" onclick="DeleteFile('{{playout._filename}}')">Restart</button>
+                            {% if playout._logfile == "No File" %}
+                                <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                            {% else %}
+                                <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" onclick="OpenFile('{{playout._logfile}}')">Log</button>
+                            {% endif %}
+                            <button class="btn" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled></button>
+
+                        </div>
+
+                        <div style="float: right; margin: 1px 0px 0px 5%"></div>
+                        <div class="{{playout._status}} default" style="float: right">{{playout._status}}</div>
+                        <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                        <div class="default" style="float: right">{{playout._time}}</div>
+                        <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                        <div class="default" style="float: right">{{playout._agent}}</div>
+
+                        <div class="default" style="float: left">{{playout._name}}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        <br><br>
+        <h3 class="default" style="padding: 0; margin: 0px 0px 5px 0px;">Vision Video</h3>
+        {% for playout in data %}
+            {% if playout._name == Playout%}
+                {% for subjob in playout._subjobs %}
+                    {% if subjob._type == 'Video' %}
+                        <div class="row row-item-small Done_row" style="padding: 5px 5px 5px 15px; white-space: nowrap; height: 22px">
+                            <div style="float: right;">
+                                <button type="button" class="btn btn-warning" style="float: left;position: relative; bottom: 2px; height: 16px" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+                                {% if subjob._logfile == "No File" %}
+                                    <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% endif %}
+                                <button class="btn" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled></button>
+                            </div>
+
+                            <div style="float: right; margin: 1px 0px 0px 5%"></div>
+                            <div class="{{subjob._status}} default" style="float: right">{{subjob._status}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._time}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._agent}}</div>
+
+                            <div class="default" style="float: left">{{subjob._name}} Vision Video</div>
+                        </div>
+                    {% endif %}
+
+                    {% if playout._subjobs[0] == subjob and subjob._type != 'Video' %}
+                        <div class="row row-item-small Error_row" style="padding: 5px 5px 5px 15px; white-space: nowrap; height: 22px">
+                            <div style="float: left">Missing .vv files</div>
+                        </div>
+                    {% endif %}
+
+                    {% if subjob._type == 'MainClip' %}
+                        <br><br>
+                        <h3 class="default" style="padding: 0; margin: 0px 0px 5px 0px;">Main Clip</h3>
+                        <div class="row row-item-small Done_row" style="padding: 5px 5px 5px 15px; white-space: nowrap; height: 22px">
+                            <div style="float: right;">
+                                <button type="button" class="btn btn-warning" style="float: left;position: relative; bottom: 2px; height: 16px; width: 161px " onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+                            </div>
+
+                            <div style="float: right; margin: 1px 0px 0px 5%"></div>
+                            <div class="{{subjob._status}} default" style="float: right">{{subjob._status}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._time}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._agent}}</div>
+
+                            <div class="default" style="float: left">{{subjob._name}}</div>
+                        </div>
+
+                        <br><br>
+                        <h3 class="default" style="padding: 0; margin: 0px 0px 5px 0px;">Sub Clip</h3>
+                        {% for subclip in subjob._subjobs %}
+                            <div class="row row-item-small {{subclip._status}}_row" style="padding: 5px 5px 5px 15px; white-space: nowrap; height: 22px">
+                                <div style="float: right;">
+                                    <button type="button" class="btn btn-warning" style="float: left;position: relative; bottom: 2px; height: 16px" onclick="DeleteFile('{{subclip._filename}}')">Restart</button>
+                                    {% if subclip._logfile == "No File" %}
+                                        <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled onclick="OpenFile('{{subclip._logfile}}')">Log</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" onclick="OpenFile('{{subclip._logfile}}')">Log</button>
+                                    {% endif %}
+                                    <button class="btn" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled></button>
+                                </div>
+
+                                <div style="float: right; margin: 1px 0px 0px 5%"></div>
+                                <div class="{{subclip._status}} default" style="float: right">{{subclip._status}}</div>
+                                <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                                <div class="default" style="float: right">{{subclip._time}}</div>
+                                <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                                <div class="default" style="float: right">{{subclip._agent}}</div>
+
+                                <div class="default" style="float: left">{{subclip._name}}</div>
+                                <div style="float: left; margin: 1px 0px 0px 1%"></div>
+                                <div class="additionalinfo default" style="float: left">: {{subclip._framerange}}</div>
+                            </div>
+                        {% endfor %}
+                        <br><br>
+                        <h3 class="default" style="padding: 0; margin: 0px 0px 5px 0px;">RS Renders</h3>
+                    {% endif %}
+
+                    {% if subjob._type == 'Render' or subjob._type == 'No Type' %}
+                        <div class="row row-item-small {{subjob._status}}_row" style="padding: 5px 5px 5px 15px; white-space: nowrap;">
+                            <div style="float: right;">
+                                <button type="button" class="btn btn-warning" style="float: left;position: relative; bottom: 2px; height: 16px" onclick="DeleteFile('{{subjob._filename}}')">Restart</button>
+                                {% if subjob._logfile == "No File" %}
+                                    <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" onclick="OpenFile('{{subjob._logfile}}')">Log</button>
+                                {% endif %}
+
+                                {% if subjob._status == "Busy" %}
+                                     <button type="button" class="btn btn-danger" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" onclick="KillRedshift('{{subjob._agent}}')">Kill RS</button>
+                                {% else %}
+                                    <button title="Render is not busy" type="button" class="btn btn-default" style="float: left;position: relative; bottom: 2px; width: 50px; height: 16px" disabled>Kill RS</button>
+                                {% endif %}
+                            </div>
+
+                            <div style="float: right; margin: 1px 0px 0px 5%"></div>
+                            <div class="{{subjob._status}} default" style="float: right">{{subjob._status}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._time}}</div>
+                            <div style="float: right; margin: 1px 0px 0px 2%"></div>
+                            <div class="default" style="float: right">{{subjob._agent}}</div>
+
+                            <div class="default" style="float: left"> Frame: <span class="additionalinfo default">{{subjob._name}}</span></div>
+
+                            {% if not playout._ispreview %}
+                                {% if subjob._missing == True %}
+                                    <div style="float: left; margin: 1px 0px 0px 1%"></div>
+                                    <div style="float: left" class="missing_files text-center default"><font>: {{subjob._missingstring}}</font></div>
+                                {% else %}
+                                    <div style="float: left; margin: 1px 0px 0px 1%"></div>
+                                    <div style="float: left" class="hasfiles default">: {{subjob._missingstring}}</div>
+                                {% endif %}
+                            {% else %}
+                                <div style="float: left; margin: 1px 0px 0px 5%"></div>
+                                <div style="float: left" class="additionalinfo default">{{subjob._previewoption}}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+
+    <script>
+        function playoutClick(playout_name){
+            window.open("/detail?playout=" + playout_name);
+        }
+
+        function closeTab (){
+            close()
+        }
+
+        function DeleteFile( file_path ){
+            $.post('/', { action: "Delete", path: file_path }, "");
+        }
+
+        function OpenFile( file_path ){
+            window.open("/log?path=" + file_path);
+        }
+
+        function KillRedshift( agent_name ){
+            $.post('/', { action: "KillRedshift", agent: agent_name }, "");
+        }
+    </script>
+
+</body>
+</html>

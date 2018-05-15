@@ -16,6 +16,7 @@ class JobInfo:
     # Special case where _framerange is set in DataCrawler.py
     # as the data is contained in splitaction .json file (not json.job)
     _framerange = "No Range"
+    _subclips_summary = "No summary"
 
     def __init__(self):
         return

@@ -13,7 +13,7 @@ print "Render Monitor Server"
 
 @app.route("/", methods=['GET'])
 def dashboard():
-    return render_template('Dashboard.html', data=DataCrawler.data, time=DataCrawler.updated_at, summary=DataCrawler.current_total_summary)
+    return render_template('Dashboard.html', data=DataCrawler.data, time=DataCrawler.updated_at, frames_summary=DataCrawler.current_frame_total_summary, playouts_summary=DataCrawler.current_playouts_total_summary, average_frame_time=DataCrawler.average_render_time, remaining_time=DataCrawler.remaining_render_time)
 
 @app.route("/", methods=['POST'])
 def action():
@@ -26,7 +26,12 @@ def action():
             if os.path.exists(data['path']):
                 os.remove(data['path'])
 
-    return render_template('Dashboard.html', data=DataCrawler.data, time=DataCrawler.updated_at, summary=DataCrawler.current_total_summary)
+    return render_template('Dashboard.html', data=DataCrawler.data, time=DataCrawler.updated_at, frames_summary=DataCrawler.current_frame_total_summary, playouts_summary=DataCrawler.current_playouts_total_summary, average_frame_time=DataCrawler.average_render_time, remaining_time=DataCrawler.remaining_render_time)
+
+@app.route("/detail", methods=['GET'])
+def detail():
+    playout_name = str(request.args["playout"])
+    return render_template('PlayoutDetail.html', data=DataCrawler.data, time=DataCrawler.updated_at, frames_summary=DataCrawler.current_frame_total_summary, playouts_summary=DataCrawler.current_playouts_total_summary, Playout=playout_name, average_frame_time=DataCrawler.average_render_time, remaining_time=DataCrawler.remaining_render_time)
 
 @app.route("/stats", methods=['GET'])
 def stats_dashboard():
@@ -37,6 +42,7 @@ def log():
     if "path" in request.args:
         content = open(request.args["path"], "r").read()
         return "<pre>" + content + "</pre>"
+
 
 def update_data():
 

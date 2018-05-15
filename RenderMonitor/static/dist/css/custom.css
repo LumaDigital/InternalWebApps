@@ -56,25 +56,27 @@
     background-color: #ff00003b;
 }
 
-.row-item {
-    margin: 2px 2px 2px 2px;
+.row-item-small {
+    margin: 2px;
     line-height: 0.8;
 }
 
-.row-item:hover {
+.row-item-medium {
+    margin: 10px;
+    line-height: 0.8;
+}
+
+.row-item-small:hover, .row-item-medium:hover {
     background-color: yellow;
 }
 
-
-.playout {
-line-height: 0.8;
-box-shadow: 0 0 7px 0px black;
-background-color: white;
+.Cutscene:hover{
+    background-color: yellow;
 }
 
 .btn {
- margin: 2px 2px 2px 2px;
- padding: 0px 0px 0px 0px;
+ padding: 2px;
+ margin: 0px 0px 0px 5px;
  line-height: 0.8;
 }
 
@@ -109,8 +111,66 @@ background-color: white;
 body {
     background-image: url("Luma.png");
     background-repeat: no-repeat;
-    background-position: center 115px;
+    margin: 20px;
+    padding: 55px;
 }
+
+.Content{
+
+}
+
+.infoBox {
+    border-style: solid;
+    border-width: 1px;
+    padding: 15px;
+    float: left;
+
+    line-height: 0.8;
+    box-shadow: 0 0 7px 0px black;
+    background-color: white;
+}
+
+.CutsceneBox {
+    width: 100%;
+    height: 185px;
+}
+
+.CutsceneBox:hover{
+    background-color: lightgrey;
+    cursor: pointer;
+}
+
+.SummaryBox{
+    width: 100%;
+    height: 185px;
+    margin: 0px 0px 50px 0px;
+}
+
+.inline{
+    display: inline;
+}
+
+.default{
+    cursor: default;
+}
+
+.CheckBox{
+    position: relative;
+    width: 25px;
+    height: 15px;
+    top: 3%
+}
+
+.ButtonsRow{
+    margin: 0px 0px 20px 10px;
+    width: 600px
+}
+
+.ButtonsColumn{
+    width: 70px;
+    margin: 15px 0px 15px 0px
+}
+
 
 /* Can't have document wide default cursor hover as it overrides button hovers */
 .body:hover, .hasfiles:hover, .additionalinfo:hover, .frame_heading:hover, .missing:hover, .playout:hover {
