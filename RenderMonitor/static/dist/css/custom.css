@@ -74,10 +74,26 @@
     background-color: yellow;
 }
 
+.section {
+
+box-shadow: 0 0 7px 0px black;
+background-color: white;
+}
+
+.heading {
+background-color: white;
+font-weight: bold;
+}
+
+
 .btn {
  padding: 2px;
  margin: 0px 0px 0px 5px;
  line-height: 0.8;
+}
+
+.btn_normal {
+
 }
 
 .missing {
