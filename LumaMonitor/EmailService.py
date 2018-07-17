@@ -1,18 +1,44 @@
 import smtplib
 import socket
+import time
+
+mail_record = {}
 
 
-def send():
+def sent_mail_already(data):
+    name = str(data['Name'])
+
+    if name in mail_record:
+        if mail_record[name] + 60 * 60 * 24 < time.time():
+
+            # Lets send another mail
+            mail_record[name] = time.time()
+            return False
+
+        else:
+            # Too soon to send another mail
+            return True
+
+    else:
+        mail_record[name] = time.time()
+        return False
+
+
+
+def send(data):
+
+    if sent_mail_already(data):
+        return
 
     local_ip = socket.gethostbyname(socket.gethostname())
-    from_address = 'johanhvanstaden@gmail.com'
-    to_address = 'johanhvanstaden@gmail.com'
+    from_address = 'lumaanimation@gmail.com'
+    to_address = 'martine@luma.co.za'
 
-    username = 'johanhvanstaden'
-    password = 'wqljpjyilfuvabku'
+    username = 'lumaanimation@gmail.com'
+    password = '$uperman1#'
 
     subject = "Server Temperature Warning"
-    text = "Machine with IP address: " + local_ip + " shutting down"
+    text = "Machine with Name: " + data['Name'] + " is running hot!"
 
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
